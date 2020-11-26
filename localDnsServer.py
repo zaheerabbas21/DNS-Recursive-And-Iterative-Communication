@@ -1,28 +1,43 @@
 import socket
-from helpers import LOCAL_HOST, LOCAL_DNS_SERVER_PORT, BUFFER_SIZE, FLAG
+import dns
+import dns.resolver
+from helpers import LOCAL_HOST, LOCAL_DNS_SERVER_PORT, BUFFER_SIZE
 from helpers import splitInput
+from helpers import ROOT_SERVER_PORT
+from helpers import actAsTemporaryClient
+from helpers import displayMessages
+from helpers import getInputForNextServer
 
 
-def sendDataToClient():
-    pass
+def handleRootServer(userInput, rootNameServer):
+    rootResult = actAsTemporaryClient(
+        userInput, ROOT_SERVER_PORT, rootNameServer)
+    print("Root Result:")
+    displayMessages(rootResult)
+    ipAddressOfTld = getInputForNextServer(rootResult)
+    return ipAddressOfTld
 
 
-def localDnsServer(message):
+def localDnsServer():
     localDnsServerSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    serverMessage = message.encode()
     try:
         localDnsServerSocket.bind((LOCAL_HOST, LOCAL_DNS_SERVER_PORT))
-        print(f"localDNS is up and running")
-        FLAG = 1
+        print(
+            f"localDNS is up and running and I am listening at Port:{LOCAL_DNS_SERVER_PORT}")
         while True:
             clientMessage, clientAddress = localDnsServerSocket.recvfrom(
                 BUFFER_SIZE)
             userInput = clientMessage.decode()
-            localDnsServerSocket.sendto(serverMessage, clientAddress)
-            print(f"Client Address:{clientAddress}")
+            print(f"Talking to the Client at the Address:{clientAddress}")
             print(f"Client Message:{userInput}")
-            splitResult = splitInput(userInput)
-            print(f"splitResult {splitResult}")
+            message = f"Hang in there client, I will get the IP Address of the requested {userInput} domain"
+            message = message.encode()
+            localDnsServerSocket.sendto(message, clientAddress)
+            defaultResolver = dns.resolver.get_default_resolver()
+            rootNameServer = defaultResolver.nameservers[0]
+            tldNameServer = handleRootServer(userInput, rootNameServer)
+            serverMessage = "".encode()
+            localDnsServerSocket.sendto(serverMessage, clientAddress)
     except KeyboardInterrupt:
         print("\nStopping the server")
         print("........")
@@ -34,5 +49,4 @@ def localDnsServer(message):
         exit()
 
 
-message = "Some Domain Name"
-localDnsServer(message)
+localDnsServer()

@@ -4,36 +4,38 @@ import dns.name
 import dns.query
 import dns.resolver
 
-def customPrint(name,value):
+
+def customPrint(name, value):
     print(name)
     print(value)
     print(type(value))
     print("$#####$")
     print()
 
+
 def get_authoritative_nameserver(domain, log=lambda msg: None):
-    customPrint("domain",domain)
+    customPrint("domain", domain)
     n = dns.name.from_text(domain)
-    customPrint("n",n)
+    customPrint("n", n)
     depth = 2
     default = dns.resolver.get_default_resolver()
     nameserver = default.nameservers[0]
-    customPrint("nameserver",nameserver)
+    customPrint("nameserver", nameserver)
     last = False
     while not last:
         s = n.split(depth)
-        customPrint("s",s)
+        customPrint("s", s)
         last = s[0].to_unicode() == u'@'
         sub = s[1]
-        customPrint("last",last)
+        customPrint("last", last)
         customPrint("sub", sub)
         log('Looking up %s on %s' % (sub, nameserver))
         query = dns.message.make_query(sub, dns.rdatatype.NS)
         customPrint("query", query)
         response = dns.query.udp(query, nameserver)
-        customPrint("response",response)
+        customPrint("response", response)
         rcode = response.rcode()
-        customPrint("rcode",rcode)
+        customPrint("rcode", rcode)
         if rcode != dns.rcode.NOERROR:
             if rcode == dns.rcode.NXDOMAIN:
                 raise Exception('%s does not exist.' % sub)
@@ -41,29 +43,30 @@ def get_authoritative_nameserver(domain, log=lambda msg: None):
                 raise Exception('Error %s' % dns.rcode.to_text(rcode))
 
         rrset = None
-        customPrint("response.authority",response.authority)
+        customPrint("response.authority", response.authority)
         if len(response.authority) > 0:
             rrset = response.authority[0]
         else:
             rrset = response.answer[0]
-        customPrint("rrset",rrset)
+            customPrint("response.answer", rrset)
+        customPrint("rrset", rrset)
 
         rr = rrset[0]
-        customPrint("rr",rr)
+        customPrint("rr", rr)
         if rr.rdtype == dns.rdatatype.SOA:
-            customPrint("rr.rdtyp",rr.rdtype)
-            customPrint("dns.rdatatype.SOA",dns.rdatatype.SOA)
+            customPrint("rr.rdtyp", rr.rdtype)
+            customPrint("dns.rdatatype.SOA", dns.rdatatype.SOA)
             log('Same server is authoritative for %s' % sub)
         else:
             authority = rr.target
-            customPrint("rr.target",rr.target)  
+            customPrint("rr.target", rr.target)
             log('%s is authoritative for %s' % (authority, sub))
             nameserver = default.query(authority).rrset[0].to_text()
-            customPrint("nameserver2",nameserver)
+            customPrint("nameserver2", nameserver)
 
         depth += 1
-        customPrint("depth2",depth)
-    customPrint("nameserver",nameserver)
+        customPrint("depth2", depth)
+    customPrint("nameserver", nameserver)
     return nameserver
 
 
