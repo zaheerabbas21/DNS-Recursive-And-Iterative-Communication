@@ -1,29 +1,26 @@
 import socket
-from helpers import LOCAL_HOST, ROOT_SERVER_PORT, BUFFER_SIZE
-from helpers import splitInput
-from helpers import getInput
 import dns
 import dns.resolver
 import dns.query
-import dns.name
 import dns.message
+import dns.message
+from helpers import LOCAL_HOST, TLD_SERVER_PORT, BUFFER_SIZE
+from helpers import splitInput
+from helpers import getInput
 
 
-def findOutTld(userInput, localNameServer):
+def findOutAuthoritative(userInput, nameServer):
     returnMessage = []
     defaultResolver = dns.resolver.get_default_resolver()
     converToDomainName = dns.name.from_text(userInput)
-    numberOfWords = 1
+    numberOfWords = 2
     rootInput = getInput(userInput, numberOfWords)
-    print("RootInput")
-    print("-----")
-    print(rootInput)
     message = f"I dont know \"{userInput}\" but I know the address of\
     \"{rootInput}\""
     returnMessage.append(message)
-    returnMessage.append(f"Looking up {rootInput} on {localNameServer}")
+    returnMessage.append(f"Looking up {rootInput} on {nameServer}")
     query = dns.message.make_query(rootInput, dns.rdatatype.NS)
-    response = dns.query.udp(query, localNameServer)
+    response = dns.query.udp(query, nameServer)
     responseCode = response.rcode()
     if responseCode != dns.rcode.NOERROR:
         if responseCode == dns.rcode.NXDOMAIN:
@@ -51,33 +48,34 @@ def findOutTld(userInput, localNameServer):
     return returnMessage
 
 
-def rootDnsServer():
-    rootDnsServerSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        rootDnsServerSocket.bind((LOCAL_HOST, ROOT_SERVER_PORT))
-        print(f"Root Server is up and running at port:{ROOT_SERVER_PORT}")
-        while True:
-            localNameServer, _ = rootDnsServerSocket.recvfrom(BUFFER_SIZE)
-            localNameServer = localNameServer.decode()
-            clientMessage, clientAddress = rootDnsServerSocket.recvfrom(
-                BUFFER_SIZE)
-            userInput = clientMessage.decode()
-            print(f"Talking to Client at Address:{clientAddress}")
-            print(f"Client Message:{userInput}")
-            result = findOutTld(userInput, localNameServer)
-            print(result)
-            serverMessage = str(result).encode()
-            print(serverMessage)
-            rootDnsServerSocket.sendto(serverMessage, clientAddress)
-    except KeyboardInterrupt:
-        print("\nStopping the server")
-        print("........")
-        print("........")
-        print("You Stopped the server")
-        exit()
-    except:
-        print("Something went wrong")
-        exit()
+def tldDnsServer():
+    tldDnsServerSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    # try:
+    tldDnsServerSocket.bind((LOCAL_HOST, TLD_SERVER_PORT))
+    print(
+        f"TLD Server is up and running at port:{TLD_SERVER_PORT}")
+    while True:
+        nameServer, _ = tldDnsServerSocket.recvfrom(BUFFER_SIZE)
+        nameServer = nameServer.decode()
+        clientMessage, clientAddress = tldDnsServerSocket.recvfrom(
+            BUFFER_SIZE)
+        userInput = clientMessage.decode()
+        print(f"Talking to Client at Address:{clientAddress}")
+        print(f"Client Message:{userInput}")
+        result = findOutAuthoritative(userInput, nameServer)
+        print(result)
+        serverMessage = str(result).encode()
+        print(serverMessage)
+        tldDnsServerSocket.sendto(serverMessage, clientAddress)
+    # except KeyboardInterrupt:
+    #     print("\nStopping the server")
+    #     print("........")
+    #     print("........")
+    #     print("You Stopped the server")
+    #     exit()
+    # except:
+    #     print("Something went wrong")
+    #     exit()
 
 
-rootDnsServer()
+tldDnsServer()

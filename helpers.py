@@ -7,6 +7,14 @@ AUTHORITATIVE_SERVER_PORT = 9003
 BUFFER_SIZE = 2324
 
 
+def customPrint(name, value):
+    print(name)
+    print(value)
+    print(type(value))
+    print("$#####$")
+    print()
+
+
 def getInputForNextServer(listOfMessages):
     print(listOfMessages)
     print(type(listOfMessages))
@@ -17,12 +25,8 @@ def getInputForNextServer(listOfMessages):
         cleanList.append(message)
     print(cleanList)
     ipAddressOfTld = str
-    count = 0
-    for mes in cleanList:
-        if(count == len(cleanList)-1):
-            ipAddressOfTld = mes
-            print(ipAddressOfTld)
-        count += 1
+    cleanList.reverse()
+    ipAddressOfTld = cleanList[0]
     return ipAddressOfTld
 
 
@@ -51,8 +55,17 @@ def actAsTemporaryClient(message, connectingPort, nameServer):
     return listOfMessages
 
 
-def getInput(result, wantedWordIndex):
-    return result[wantedWordIndex]
+def getInput(givenInput, numberOfWords):
+    result = splitInput(givenInput)
+    customPrint("result", result)
+    result.reverse()
+    customPrint("reverseSplitInput", result)
+    returningString = ""
+    customPrint("returningString", returningString)
+    for i in range(numberOfWords):
+        returningString = returningString + result[i]
+        customPrint("returningString", returningString)
+    return returningString
 
 
 def splitInput(userInput) -> list:

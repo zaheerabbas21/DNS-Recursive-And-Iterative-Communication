@@ -15,6 +15,7 @@ def handleRootServer(userInput, rootNameServer):
     print("Root Result:")
     displayMessages(rootResult)
     ipAddressOfTld = getInputForNextServer(rootResult)
+    print(ipAddressOfTld)
     return ipAddressOfTld
 
 
