@@ -4,29 +4,20 @@ import dns.resolver
 from helpers import LOCAL_HOST, LOCAL_DNS_SERVER_PORT, BUFFER_SIZE
 from helpers import ROOT_SERVER_PORT
 from helpers import TLD_SERVER_PORT
+from helpers import AUTHORITATIVE_SERVER_PORT
 from helpers import splitInput
 from helpers import actAsTemporaryClient
 from helpers import displayMessages
 from helpers import getInputForNextServer
 
 
-def handleTldServer(userInput, tldNameServer):
-    tldResult = actAsTemporaryClient(userInput, TLD_SERVER_PORT, tldNameServer)
-    print("Tld Result:")
-    displayMessages(tldResult)
-    ipAdressOfAuthoritative = getInputForNextServer(tldResult)
-    print(ipAdressOfAuthoritative)
-    return ipAdressOfAuthoritative
-
-
-def handleRootServer(userInput, rootNameServer):
-    rootResult = actAsTemporaryClient(
-        userInput, ROOT_SERVER_PORT, rootNameServer)
-    print("Root Result:")
-    displayMessages(rootResult)
-    ipAddressOfTld = getInputForNextServer(rootResult)
-    print(ipAddressOfTld)
-    return ipAddressOfTld
+def generalServerHandler(userInput, nameServer, connectedPort, message):
+    result = actAsTemporaryClient(userInput, connectedPort, nameServer)
+    print(message)
+    displayMessages(result)
+    ipAddress = getInputForNextServer(result)
+    print(ipAddress)
+    return ipAddress
 
 
 def localDnsServer():
@@ -46,8 +37,15 @@ def localDnsServer():
             localDnsServerSocket.sendto(message, clientAddress)
             defaultResolver = dns.resolver.get_default_resolver()
             rootNameServer = defaultResolver.nameservers[0]
-            tldNameServer = handleRootServer(userInput, rootNameServer)
-            authoritativeServer = handleTldServer(userInput, tldNameServer)
+            rootMessage = "Root Result"
+            tldNameServer = generalServerHandler(
+                userInput, rootNameServer, ROOT_SERVER_PORT, rootMessage)
+            tldMessage = "TLD Result"
+            authoritativeServer = generalServerHandler(
+                userInput, tldNameServer, TLD_SERVER_PORT, tldMessage)
+            authoritativeMessage = "Authoritative Result"
+            # finalIpAddress = generalServerHandler(
+            #     userInput, authoritativeServer, AUTHORITATIVE_SERVER_PORT, authoritativeMessage)
             serverMessage = "".encode()
             localDnsServerSocket.sendto(serverMessage, clientAddress)
     except KeyboardInterrupt:
