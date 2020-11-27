@@ -4,27 +4,23 @@ import dns.resolver
 import dns.query
 import dns.message
 import dns.message
-from helpers import LOCAL_HOST, TLD_SERVER_PORT, BUFFER_SIZE
+from helpers import LOCAL_HOST, AUTHORITATIVE_SERVER_PORT, BUFFER_SIZE
 from helpers import splitInput
 from helpers import getInput
 from helpers import customPrint
 
 
-def findOutAuthoritative(userInput, nameServer):
+def findOutResultantIp(userInput, nameServer):
     returnMessage = []
     defaultResolver = dns.resolver.get_default_resolver()
     customPrint("defaultResolver", defaultResolver)
     converToDomainName = dns.name.from_text(userInput)
     customPrint("converToDomainName", converToDomainName)
-    numberOfWords = 2
-    tldInput = getInput(userInput, numberOfWords)
-    customPrint("tldInput", tldInput)
-    if len(splitInput(userInput)) > 2:
-        message = f"I dont know \"{userInput}\" but I know the address of\
-        \"{tldInput}\""
-        returnMessage.append(message)
-    returnMessage.append(f"Looking up {tldInput} on {nameServer}")
-    query = dns.message.make_query(tldInput, dns.rdatatype.NS)
+    numberOfWords = len(splitInput(userInput))
+    authoritativeInput = getInput(userInput, numberOfWords)
+    customPrint("authoritativeInput", authoritativeInput)
+    returnMessage.append(f"Looking up {authoritativeInput} on {nameServer}")
+    query = dns.message.make_query(authoritativeInput, dns.rdatatype.A)
     customPrint("query", query)
     response = dns.query.udp(query, nameServer)
     customPrint("response", response)
@@ -32,57 +28,63 @@ def findOutAuthoritative(userInput, nameServer):
     customPrint("responseCode", responseCode)
     if responseCode != dns.rcode.NOERROR:
         if responseCode == dns.rcode.NXDOMAIN:
-            returnMessage.append(f"{tldInput} does not exist.")
+            returnMessage.append(f"{authoritativeInput} does not exist.")
             returnMessage.append("Please enter a legible domain")
             return returnMessage
         else:
             returnMessage.append("Please enter a legible domain.")
             return returnMessage
+    flag = False
     resourceRecordSet = None
-    if len(response.authority) > 0:
-        resourceRecordSet = response.authority[0]
-        customPrint("response.authority", resourceRecordSet)
-    else:
+    resourceRecord = ""
+    if len(response.answer) > 0:
         resourceRecordSet = response.answer[0]
         customPrint("response.answer", resourceRecordSet)
-    resourceRecord = resourceRecordSet[0]
-    customPrint("resourceRecord", resourceRecord)
-    if resourceRecord.rdtype == dns.rdatatype.SOA:
-        returnMessage.append(f"Same server is authoritative for {tldInput}")
+        resourceRecord = resourceRecordSet[0]
+        customPrint("resourceRecord", resourceRecord)
         customPrint("resourceRecord.rdtype", resourceRecord.rdtype)
+        if resourceRecord.rdtype != dns.rdatatype.A:
+            returnMessage.append(
+                f"{userInput} requires another Authoritative Server Call, fetching it directly")
+            answer = dns.resolver.resolve(userInput, 'A')
+            customPrint("answer", answer)
+            resourceRecord = answer[0]
+            customPrint("resourceRecord", resourceRecord)
     else:
-        authoritativeServerName = resourceRecord.target
-        customPrint("authoritativeServerName", authoritativeServerName)
         returnMessage.append(
-            f"{authoritativeServerName} is authoritative for {tldInput}")
-        ipAdressofTld = defaultResolver.query(
-            authoritativeServerName).rrset[0].to_text()
-        customPrint("ipAdressofTld", ipAdressofTld)
-        returnMessage.append(str(authoritativeServerName))
-        returnMessage.append(ipAdressofTld)
-        customPrint("returnMessage", returnMessage)
+            f"{userInput} requires another Authoritative Server Call, fetching it directly")
+        answer = dns.resolver.resolve(userInput, 'A')
+        customPrint("answer", answer)
+        resourceRecord = answer[0]
+        customPrint("resourceRecord", resourceRecord)
+    customPrint("resourceRecord", resourceRecord)
+    finalIPAddress = str(resourceRecord)
+    returnMessage.append(f"IP address of the {userInput} is {finalIPAddress}")
+    returnMessage.append(finalIPAddress)
     return returnMessage
 
 
-def tldDnsServer():
-    tldDnsServerSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+def authoritativeDnsServer():
+    authoritativeDnsServerSocket = socket.socket(
+        socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        tldDnsServerSocket.bind((LOCAL_HOST, TLD_SERVER_PORT))
+        authoritativeDnsServerSocket.bind(
+            (LOCAL_HOST, AUTHORITATIVE_SERVER_PORT))
         print(
-            f"TLD Server is up and running at port:{TLD_SERVER_PORT}")
+            f"Authoritative Server is up and running at port:{AUTHORITATIVE_SERVER_PORT}")
         while True:
-            nameServer, _ = tldDnsServerSocket.recvfrom(BUFFER_SIZE)
+            nameServer, _ = authoritativeDnsServerSocket.recvfrom(BUFFER_SIZE)
             nameServer = nameServer.decode()
-            clientMessage, clientAddress = tldDnsServerSocket.recvfrom(
-                BUFFER_SIZE)
+            clientMessage, clientAddress = authoritativeDnsServerSocket.\
+                recvfrom(BUFFER_SIZE)
             userInput = clientMessage.decode()
             print(f"Talking to Client at Address:{clientAddress}")
             print(f"Client Message:{userInput}")
-            result = findOutAuthoritative(userInput, nameServer)
+            result = findOutResultantIp(userInput, nameServer)
             print(result)
             serverMessage = str(result).encode()
             print(serverMessage)
-            tldDnsServerSocket.sendto(serverMessage, clientAddress)
+            authoritativeDnsServerSocket.sendto(serverMessage, clientAddress)
     except KeyboardInterrupt:
         print("\nStopping the server")
         print("........")
@@ -94,4 +96,4 @@ def tldDnsServer():
         exit()
 
 
-tldDnsServer()
+authoritativeDnsServer()

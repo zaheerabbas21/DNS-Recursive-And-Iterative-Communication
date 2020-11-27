@@ -18,8 +18,7 @@ def findOutTld(userInput, localNameServer):
     print("RootInput")
     print("-----")
     print(rootInput)
-    message = f"I dont know \"{userInput}\" but I know the address of\
-    \"{rootInput}\""
+    message = f"I dont know \"{userInput}\" but I know the address of \"{rootInput}\""
     returnMessage.append(message)
     returnMessage.append(f"Looking up {rootInput} on {localNameServer}")
     query = dns.message.make_query(rootInput, dns.rdatatype.NS)
@@ -45,9 +44,12 @@ def findOutTld(userInput, localNameServer):
         tldServerName = resourceRecord.target
         returnMessage.append(
             f"{tldServerName} is authoritative for {rootInput}")
-        ipAdressofTld = defaultResolver.query(tldServerName).rrset[0].to_text()
+        ipAddressofTld = defaultResolver.query(
+            tldServerName).rrset[0].to_text()
+        returnMessage.append(
+            f"IP Address of {tldServerName} is {ipAddressofTld}")
         returnMessage.append(str(tldServerName))
-        returnMessage.append(ipAdressofTld)
+        returnMessage.append(ipAddressofTld)
     return returnMessage
 
 

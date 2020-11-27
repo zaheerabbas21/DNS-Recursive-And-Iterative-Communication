@@ -55,11 +55,13 @@ def findOutAuthoritative(userInput, nameServer):
         customPrint("authoritativeServerName", authoritativeServerName)
         returnMessage.append(
             f"{authoritativeServerName} is authoritative for {tldInput}")
-        ipAdressofTld = defaultResolver.query(
+        ipAddressofAuthoritative = defaultResolver.query(
             authoritativeServerName).rrset[0].to_text()
-        customPrint("ipAdressofTld", ipAdressofTld)
+        customPrint("ipAdressofTld", ipAddressofAuthoritative)
+        returnMessage.append(
+            f"Ip Address of {authoritativeServerName} is {ipAddressofAuthoritative}")
         returnMessage.append(str(authoritativeServerName))
-        returnMessage.append(ipAdressofTld)
+        returnMessage.append(ipAddressofAuthoritative)
         customPrint("returnMessage", returnMessage)
     return returnMessage
 

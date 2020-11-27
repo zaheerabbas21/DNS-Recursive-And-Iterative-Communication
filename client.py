@@ -33,11 +33,15 @@ while True:
     print("Please Enter the domain name: ")
     example = "subdomain.domain.com or domain.com"
     print(f"Example : {example}")
-    userInput = input()
-    userInput = userInput.lower()
-    result = isValid(userInput)
-    if result:
-        connectClientToLocalDnsServer(userInput)
+    try:
+        userInput = input()
+        userInput = userInput.lower()
+        result = isValid(userInput)
+        if result:
+            connectClientToLocalDnsServer(userInput)
+    except KeyboardInterrupt:
+        print("\n...Exiting Program")
+        exit()
     else:
         print(
             f"Please enter a domain name as shown in the example : {example}")

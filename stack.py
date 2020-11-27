@@ -43,12 +43,17 @@ def get_authoritative_nameserver(domain, log=lambda msg: None):
                 raise Exception('Error %s' % dns.rcode.to_text(rcode))
 
         rrset = None
+        flag = 1
         customPrint("response.authority", response.authority)
         if len(response.authority) > 0:
             rrset = response.authority[0]
+            customPrint("response.authority", rrset)
+            print(flag)
         else:
             rrset = response.answer[0]
+            flag = 0
             customPrint("response.answer", rrset)
+            print(flag)
         customPrint("rrset", rrset)
 
         rr = rrset[0]

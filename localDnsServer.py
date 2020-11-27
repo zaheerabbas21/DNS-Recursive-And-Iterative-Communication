@@ -44,9 +44,9 @@ def localDnsServer():
             authoritativeServer = generalServerHandler(
                 userInput, tldNameServer, TLD_SERVER_PORT, tldMessage)
             authoritativeMessage = "Authoritative Result"
-            # finalIpAddress = generalServerHandler(
-            #     userInput, authoritativeServer, AUTHORITATIVE_SERVER_PORT, authoritativeMessage)
-            serverMessage = "".encode()
+            finalIpAddress = generalServerHandler(
+                userInput, authoritativeServer, AUTHORITATIVE_SERVER_PORT, authoritativeMessage)
+            serverMessage = finalIpAddress.encode()
             localDnsServerSocket.sendto(serverMessage, clientAddress)
     except KeyboardInterrupt:
         print("\nStopping the server")

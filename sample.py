@@ -11,7 +11,7 @@
 # #         ipaddress = row.get('ipaddress')
 # #         if hostname.endswith('com'):
 # #             print(str(hostname) + ' ----------> ' + str(ipaddress))
-            
+
 # import dns
 # import dns.name
 # import dns.resolver
@@ -29,7 +29,7 @@
 # answers = dns.resolver.resolve(user,"SOA")
 # for rdata in answers:
 #     print(rdata)
-    
+
 # # print(type(rdata))
 # # default = dns.resolver.get_default_resolver()
 # # nameserver = default.nameservers[0]
@@ -39,23 +39,23 @@
 # last = userInput[0].to_unicode() == u'@'
 # print(last)
 
-import socket
-import dns
-import dns.query
-import dns.name
-import dns.resolver
+# import socket
+# import dns
+# import dns.query
+# import dns.name
+# import dns.resolver
 
-default = dns.resolver.get_default_resolver()
-nameserver = default.nameservers[0]
-userInput = input("Enter the domain: ")
-query = dns.message.make_query(userInput,dns.rdatatype.A)
-print(query)
-response = dns.query.udp(query,nameserver)
-print(response)
-result = dns.resolver.resolve(userInput)
-print(result)
-for rdata in result:
-    print(rdata)
+# default = dns.resolver.get_default_resolver()
+# nameserver = default.nameservers[0]
+# userInput = input("Enter the domain: ")
+# query = dns.message.make_query(userInput,dns.rdatatype.A)
+# print(query)
+# response = dns.query.udp(query,nameserver)
+# print(response)
+# result = dns.resolver.resolve(userInput)
+# print(result)
+# for rdata in result:
+#     print(rdata)
 
 # import socket
 # import ssl
@@ -79,3 +79,52 @@ for rdata in result:
 # 	print(data.decode(), end=' ')
 
 # mysocket.close()
+
+
+# import dns
+# import dns.message
+# import dns.query
+# import dns.name
+# import dns.resolver
+# from helpers import customPrint
+
+# default = dns.resolver.get_default_resolver()
+# nameserver = "216.239.34.10"
+# customPrint("nameserver", nameserver)
+# query = dns.message.make_query("google.com", dns.rdatatype.A)
+# print(f"Looking google.com on {nameserver}")
+# customPrint("query", query)
+# response = dns.query.udp(query, nameserver)
+# customPrint("response", response)
+# rcode = response.rcode()
+# customPrint("rcode", rcode)
+# if rcode != dns.rcode.NOERROR:
+#     if rcode == dns.rcode.NXDOMAIN:
+#         raise Exception('google.com does not exist.')
+#     else:
+#         raise Exception('Error %s' % dns.rcode.to_text(rcode))
+
+# rrset = None
+# customPrint("response.authority", response.authority)
+# if len(response.authority) > 0:
+#     rrset = response.authority[0]
+# else:
+#     rrset = response.answer[0]
+#     customPrint("response.answer", rrset)
+# customPrint("rrset", rrset)
+
+# rr = rrset[0]
+# customPrint("rr", rr)
+# customPrint("rr.rdtype", rr.rdtype)
+
+import dns.resolver
+import dns
+from helpers import customPrint
+userInput = "gitlab.com"
+
+result = dns.resolver.resolve(userInput, 'A')
+answer = result[0]
+customPrint("an", answer)
+for r in result:
+    customPrint("answer", r)
+customPrint("result", result)
