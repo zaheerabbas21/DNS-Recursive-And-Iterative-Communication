@@ -2,11 +2,21 @@ import socket
 import dns
 import dns.resolver
 from helpers import LOCAL_HOST, LOCAL_DNS_SERVER_PORT, BUFFER_SIZE
-from helpers import splitInput
 from helpers import ROOT_SERVER_PORT
+from helpers import TLD_SERVER_PORT
+from helpers import splitInput
 from helpers import actAsTemporaryClient
 from helpers import displayMessages
 from helpers import getInputForNextServer
+
+
+def handleTldServer(userInput, tldNameServer):
+    tldResult = actAsTemporaryClient(userInput, TLD_SERVER_PORT, tldNameServer)
+    print("Tld Result:")
+    displayMessages(tldResult)
+    ipAdressOfAuthoritative = getInputForNextServer(tldResult)
+    print(ipAdressOfAuthoritative)
+    return ipAdressOfAuthoritative
 
 
 def handleRootServer(userInput, rootNameServer):
@@ -37,6 +47,7 @@ def localDnsServer():
             defaultResolver = dns.resolver.get_default_resolver()
             rootNameServer = defaultResolver.nameservers[0]
             tldNameServer = handleRootServer(userInput, rootNameServer)
+            authoritativeServer = handleTldServer(userInput, tldNameServer)
             serverMessage = "".encode()
             localDnsServerSocket.sendto(serverMessage, clientAddress)
     except KeyboardInterrupt:

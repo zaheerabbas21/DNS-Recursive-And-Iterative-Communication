@@ -63,7 +63,7 @@ def getInput(givenInput, numberOfWords):
     returningString = ""
     customPrint("returningString", returningString)
     for i in range(numberOfWords):
-        returningString = returningString + result[i]
+        returningString = result[i] + "." + returningString
         customPrint("returningString", returningString)
     return returningString
 
