@@ -1,5 +1,5 @@
 from sys import *
-from localDnsClient import *
+from helpers import LOCAL_HOST, LOCAL_DNS_SERVER_PORT, BUFFER_SIZE
 import re
 import socket
 import helpers
@@ -39,9 +39,9 @@ while True:
         result = isValid(userInput)
         if result:
             connectClientToLocalDnsServer(userInput)
+        else:
+            print(
+                f"Please enter a domain name as shown in the example : {example}")
     except KeyboardInterrupt:
         print("\n...Exiting Program")
         exit()
-    else:
-        print(
-            f"Please enter a domain name as shown in the example : {example}")
