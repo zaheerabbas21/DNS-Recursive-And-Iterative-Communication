@@ -1,12 +1,15 @@
 import socket
-from helpers import LOCAL_HOST, ROOT_SERVER_PORT, BUFFER_SIZE
-from helpers import splitInput
-from helpers import getInput
 import dns
 import dns.resolver
 import dns.query
 import dns.name
 import dns.message
+import warnings
+from helpers import LOCAL_HOST, ROOT_SERVER_PORT, BUFFER_SIZE
+from helpers import splitInput
+from helpers import getInput
+from helpers import customPrint
+from helpers import displayMessages
 
 
 def findOutTld(userInput, localNameServer):
@@ -15,18 +18,17 @@ def findOutTld(userInput, localNameServer):
     converToDomainName = dns.name.from_text(userInput)
     numberOfWords = 1
     rootInput = getInput(userInput, numberOfWords)
-    print("RootInput")
-    print("-----")
-    print(rootInput)
-    message = f"I dont know \"{userInput}\" but I know the address of \"{rootInput}\""
+    customPrint("Customized rootInput", rootInput)
+    message = f"I dont know the address of \"{userInput}\" but I know the address of \"{rootInput}\""
     returnMessage.append(message)
-    returnMessage.append(f"Looking up {rootInput} on {localNameServer}")
+    returnMessage.append(
+        f"Looking up \"{rootInput}\" on \"{localNameServer}\"")
     query = dns.message.make_query(rootInput, dns.rdatatype.NS)
     response = dns.query.udp(query, localNameServer)
     responseCode = response.rcode()
     if responseCode != dns.rcode.NOERROR:
         if responseCode == dns.rcode.NXDOMAIN:
-            returnMessage.append(f"{rootInput} does not exist.")
+            returnMessage.append(f"\"{rootInput}\" does not exist.")
             returnMessage.append("Please enter a legible domain")
             return returnMessage
         else:
@@ -39,15 +41,17 @@ def findOutTld(userInput, localNameServer):
         resourceRecordSet = response.answer[0]
     resourceRecord = resourceRecordSet[0]
     if resourceRecord.rdtype == dns.rdatatype.SOA:
-        returnMessage.append(f"Same server is authoritative for {rootInput}")
+        returnMessage.append(
+            f"Same server is TLD Server for \"{rootInput}\"")
     else:
         tldServerName = resourceRecord.target
         returnMessage.append(
-            f"{tldServerName} is authoritative for {rootInput}")
+            f"\"{tldServerName}\" is TLD Server for \"{rootInput}\"")
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
         ipAddressofTld = defaultResolver.query(
             tldServerName).rrset[0].to_text()
         returnMessage.append(
-            f"IP Address of {tldServerName} is {ipAddressofTld}")
+            f"IP Address of \"{tldServerName}\" is \"{ipAddressofTld}\"")
         returnMessage.append(str(tldServerName))
         returnMessage.append(ipAddressofTld)
     return returnMessage
@@ -67,9 +71,8 @@ def rootDnsServer():
             print(f"Talking to Client at Address:{clientAddress}")
             print(f"Client Message:{userInput}")
             result = findOutTld(userInput, localNameServer)
-            print(result)
+            displayMessages(result)
             serverMessage = str(result).encode()
-            print(serverMessage)
             rootDnsServerSocket.sendto(serverMessage, clientAddress)
     except KeyboardInterrupt:
         print("\nStopping the server")

@@ -9,14 +9,15 @@ from helpers import splitInput
 from helpers import actAsTemporaryClient
 from helpers import displayMessages
 from helpers import getInputForNextServer
+from helpers import customPrint
 
 
 def generalServerHandler(userInput, nameServer, connectedPort, message):
     result = actAsTemporaryClient(userInput, connectedPort, nameServer)
-    print(message)
+    print(message + ":")
     displayMessages(result)
     ipAddress = getInputForNextServer(result)
-    print(ipAddress)
+    print("Returned IP Address :", ipAddress)
     return ipAddress
 
 
@@ -32,7 +33,7 @@ def localDnsServer():
             userInput = clientMessage.decode()
             print(f"Talking to the Client at the Address:{clientAddress}")
             print(f"Client Message:{userInput}")
-            message = f"Hang in there client, I will get the IP Address of the requested {userInput} domain"
+            message = f"Hang in there client, I will get the IP Address of the \"{userInput}\""
             message = message.encode()
             localDnsServerSocket.sendto(message, clientAddress)
             defaultResolver = dns.resolver.get_default_resolver()
@@ -46,6 +47,9 @@ def localDnsServer():
             authoritativeMessage = "Authoritative Result"
             finalIpAddress = generalServerHandler(
                 userInput, authoritativeServer, AUTHORITATIVE_SERVER_PORT, authoritativeMessage)
+            print()
+            print(f"Final IP Address : {finalIpAddress}")
+            print()
             serverMessage = finalIpAddress.encode()
             localDnsServerSocket.sendto(serverMessage, clientAddress)
     except KeyboardInterrupt:

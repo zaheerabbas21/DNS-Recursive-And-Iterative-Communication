@@ -12,8 +12,9 @@ def connectClientToLocalDnsServer(message):
     originalClientSocket.sendto(originalClientMessage, connectingAddress)
     serverMessage, serverAddress = originalClientSocket.recvfrom(BUFFER_SIZE)
     serverMessage = serverMessage.decode()
-    print(f"Talking to the server at the Address: {serverAddress}")
-    print(f"Message from Server: {serverMessage}")
+    print(f"Talking to the localDnsServer at the Address: {serverAddress}")
+    print(f"Message from {serverAddress}:")
+    print(f"{serverMessage}")
     result, _ = originalClientSocket.recvfrom(BUFFER_SIZE)
     result = result.decode()
     print(f"Resultant IP Address received from the localDnsServer: {result}")
@@ -30,18 +31,24 @@ def isValid(userInput):
 
 
 while True:
-    print("Please Enter the domain name: ")
+    print()
+    print("Please Enter the domain name or \"break\" to exit: ")
     example = "subdomain.domain.com or domain.com"
     print(f"Example : {example}")
     try:
         userInput = input()
         userInput = userInput.lower()
+        if userInput == "break":
+            print("\n...Exiting Program")
+            break
         result = isValid(userInput)
         if result:
             connectClientToLocalDnsServer(userInput)
         else:
+            print()
             print(
                 f"Please enter a domain name as shown in the example : {example}")
+            print()
     except KeyboardInterrupt:
         print("\n...Exiting Program")
         exit()

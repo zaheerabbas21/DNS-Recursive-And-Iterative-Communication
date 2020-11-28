@@ -8,22 +8,18 @@ BUFFER_SIZE = 65535
 
 
 def customPrint(name, value):
-    print(name)
+    print()
+    print(name + ":")
     print(value)
-    print(type(value))
-    print("$#####$")
     print()
 
 
 def getInputForNextServer(listOfMessages):
-    print(listOfMessages)
-    print(type(listOfMessages))
     cleanList = []
     for message in listOfMessages:
         message = message.strip()
         message = message.replace("'", "")
         cleanList.append(message)
-    print(cleanList)
     ipAddressOfTld = str
     cleanList.reverse()
     ipAddressOfTld = cleanList[0]
@@ -32,8 +28,10 @@ def getInputForNextServer(listOfMessages):
 
 def displayMessages(listOfMessages):
     for message in listOfMessages:
+        message = message.strip()
         message = message.replace("'", "")
         print(message)
+    print()
 
 
 def actAsTemporaryClient(message, connectingPort, nameServer):
@@ -45,26 +43,19 @@ def actAsTemporaryClient(message, connectingPort, nameServer):
     tempClientSocket.sendto(queryMessage, connectingAddress)
     serverMessage, serverAddress = tempClientSocket.recvfrom(BUFFER_SIZE)
     serverMessage = serverMessage.decode()
-    print(f"Message from server: {serverMessage}")
-    print(f"Address of the server: {serverAddress}")
-    print(type(serverMessage))
+    print()
+    print(f"Message from {serverAddress}:")
     listOfMessages = serverMessage.strip('[]').split(',')
-    print(listOfMessages)
-    print(type(listOfMessages))
     tempClientSocket.close()
     return listOfMessages
 
 
 def getInput(givenInput, numberOfWords):
     result = splitInput(givenInput)
-    customPrint("result", result)
     result.reverse()
-    customPrint("reverseSplitInput", result)
     returningString = ""
-    customPrint("returningString", returningString)
     for i in range(numberOfWords):
         returningString = result[i] + "." + returningString
-        customPrint("returningString", returningString)
     return returningString
 
 
