@@ -16,7 +16,7 @@ def connectClientToLocalDnsServer(message):
     print(f"Message from Server: {serverMessage}")
     result, _ = originalClientSocket.recvfrom(BUFFER_SIZE)
     result = result.decode()
-    print(f"Message from the server 1: {result}")
+    print(f"Resultant IP Address received from the localDnsServer: {result}")
     originalClientSocket.close()
 
 
