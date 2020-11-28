@@ -2,7 +2,7 @@
 
 This is a command line Project which helps to understand how the DNS servers communicate with each other.
 
-# Design Document:
+# Design Document
 
 Please click the following link : [DesignDoc](https://docs.google.com/document/d/1Eimv41L5Ux_zGSOL4soyMJsISRuCdBDwVvvInedXIpI/edit?usp=sharing)
 
