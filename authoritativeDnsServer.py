@@ -81,7 +81,7 @@ def authoritativeDnsServer():
         print("You Stopped the server")
         exit()
     except:
-        print("Something went wrong")
+        print("Enter Eligible Domain Name")
         exit()
 
 
