@@ -15,8 +15,11 @@ from helpers import getInput
 cache = {}
 
 
-def searchInCache():
-    pass
+def fetchFromCache(searchKey):
+    ipAddress = cache.get(searchKey)
+    print(f"\"{searchKey}\" found in cache")
+    print(f"IP Address of \"{searchKey}\" is \"{ipAddress}\"")
+    return ipAddress
 
 
 def generalServerHandler(userInput, nameServer, connectedPort, message):
@@ -55,9 +58,12 @@ def localDnsServer():
         customPrint("tldInput", tldInput)
         customPrint("_", _)
         customPrint("authoritativeInput", authoritativeInput)
-        rootMessage = "Root Result"
-        tldNameServer = generalServerHandler(
-            userInput, rootNameServer, ROOT_SERVER_PORT, rootMessage)
+        if bool(cache) and rootInput in cache:
+            tldNameServer = fetchFromCache(rootInput)
+        else:
+            rootMessage = "Root Result"
+            tldNameServer = generalServerHandler(
+                userInput, rootNameServer, ROOT_SERVER_PORT, rootMessage)
         cache[rootInput] = tldNameServer
         tldMessage = "TLD Result"
         authoritativeServer = generalServerHandler(
