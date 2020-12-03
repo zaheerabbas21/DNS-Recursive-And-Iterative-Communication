@@ -31,7 +31,6 @@ def findOutResultantIp(userInput, nameServer):
         else:
             returnMessage.append("Please enter a legible domain.")
             return returnMessage
-    flag = False
     resourceRecordSet = None
     resourceRecord = ""
     if len(response.answer) > 0:
