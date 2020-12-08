@@ -36,7 +36,7 @@ python client.py
 
 You can give any domain and the servers will give you the respective IP Addresses.
 
-The IP Address is queried using `dnspython` library. But this repo handles the communication between the servers and demos such senario.
+The IP Address is queried using `dnspython` library. But this repo handles the communication between the servers and demos such scenario.
 If you find any issues, please feel free to open an issue. I will try to solve that issue.
 
 If you like the project, give it a start. I would appreciate it.
