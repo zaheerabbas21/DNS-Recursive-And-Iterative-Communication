@@ -4,9 +4,9 @@ This is a command line Project which helps to understand how the DNS servers com
 
 # Design Document
 
-Please click the following link : [DesignDoc](https://docs.google.com/document/d/1Eimv41L5Ux_zGSOL4soyMJsISRuCdBDwVvvInedXIpI/edit?usp=sharing)
+Please click the following link : [Design Document](https://docs.google.com/document/d/1Eimv41L5Ux_zGSOL4soyMJsISRuCdBDwVvvInedXIpI/edit?usp=sharing)
 
-You can leave comments on the design doc if you have any question regarding it.
+You can leave comments on the design doc if you have any question regarding it. I will try to answer it.
 
 # Setup
 
