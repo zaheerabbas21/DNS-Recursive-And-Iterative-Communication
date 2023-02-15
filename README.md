@@ -41,4 +41,4 @@ If you find any issues, please feel free to open an issue. I will try to solve t
 
 If you like the project, give it a start. I would appreciate it.
 
-Thank you for checking out the project.
+Thank you for checking out the project :smile:.
